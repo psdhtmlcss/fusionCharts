@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My first chart using FusionCharts Suite XT</title>
+  <!-- Include fusioncharts core library -->
+  <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+  <!-- Include fusion theme -->
+  <script type="text/javascript"
+    src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+  <script type="text/javascript">
+    const loadData = (url) => {
+      return fetch(url)
+        .then(response => {
+          console.log(response);
+          return response.json();
+        })
+    }
+    Promise.all([
+        loadData(
+          "https://s3.eu-central-1.amazonaws.com/fusion.store/ft/data/ibm-data-data.json"
+        ),
+        loadData(
+          "https://s3.eu-central-1.amazonaws.com/fusion.store/ft/schema/ibm-data-schema.json"
+        )
+      ]).then(function (res) {
+        const data = res[0];
+        const schema = res[1];
+
+        const dataStore = new FusionCharts.DataStore();
+        const dataSource = {
+          chart: {},
+          caption: {
+            text: "Stock history of IBM"
+          },
+          subcaption: {
+            text: "Over one million data points"
+          },
+          yaxis: [
+            {
+              plot: {
+                value: "Closing Price",
+                connectnulldata: true
+              },
+              format: {
+                prefix: "$"
+              },
+              title: "Closing Stock Price"
+            }
+          ]
+        };
+        dataSource.data = dataStore.createDataTable(data, schema);
+
+        new FusionCharts({
+          type: "timeseries",
+          renderAt: "chart-container",
+          width: "100%",
+          height: "500",
+          dataSource: dataSource
+        }).render();
+      });
+
+
+  </script>
+</head>
+
+<body>
+  <div id="chart-container">FusionCharts XT will load here!</div>
+</body>
+
+</html>
